@@ -13,16 +13,20 @@
 package org.camunda.bpm.engine.test.cmmn.handler;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
-import org.camunda.bpm.engine.impl.cmmn.handler.HumanTaskDiscretionaryItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.HumanTaskItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
@@ -38,7 +42,7 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
   protected HumanTask humanTask;
   protected PlanningTable planningTable;
   protected DiscretionaryItem discretionaryItem;
-  protected HumanTaskDiscretionaryItemHandler handler = new HumanTaskDiscretionaryItemHandler();
+  protected HumanTaskItemHandler handler = new HumanTaskItemHandler();
   protected CmmnHandlerContext context;
 
   @Before
@@ -51,6 +55,14 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
     discretionaryItem.setDefinition(humanTask);
 
     context = new CmmnHandlerContext();
+
+    CaseDefinitionEntity caseDefinition = new CaseDefinitionEntity();
+    caseDefinition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
+    context.setCaseDefinition(caseDefinition);
+
+    ExpressionManager expressionManager = new ExpressionManager();
+    context.setExpressionManager(expressionManager);
+
   }
 
   @Test
@@ -101,8 +113,13 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);
 
     // then
-    Boolean isBlocking = (Boolean) activity.getProperty("isBlocking");
-    assertFalse(isBlocking);
+    // According to the specification:
+    // When a HumanTask is not 'blocking'
+    // (isBlocking is 'false'), it can be
+    // considered a 'manual' Task, i.e.,
+    // the Case management system is not
+    // tracking the lifecycle of the HumanTask (instance).
+    assertNull(activity);
   }
 
   @Test

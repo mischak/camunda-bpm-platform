@@ -16,12 +16,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.CasePlanModelHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
+import org.camunda.bpm.model.cmmn.instance.camunda.CamundaCaseExecutionListener;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,6 +41,9 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
   @Before
   public void setUp() {
     context = new CmmnHandlerContext();
+
+    ExpressionManager expressionManager = new ExpressionManager();
+    context.setExpressionManager(expressionManager);
   }
 
   @Test
@@ -91,4 +98,21 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     assertTrue(parent.getActivities().contains(activity));
   }
 
+  @Test
+  public void testCreateCaseExecutionListenerByClass() {
+    // given:
+    ExtensionElements extensionElements = addExtensionElements(casePlanModel);
+    CamundaCaseExecutionListener caseExecutionListener = createElement(extensionElements, null, CamundaCaseExecutionListener.class);
+
+    caseExecutionListener.setCamundaEvent(CaseExecutionListener.CREATE);
+    caseExecutionListener.setCamundaClass("org.camunda.bpm.test.caseexecutionlistener.ABC");
+
+    // when
+    CmmnActivity activity = handler.handleElement(casePlanModel, context);
+
+
+
+
+
+  }
 }

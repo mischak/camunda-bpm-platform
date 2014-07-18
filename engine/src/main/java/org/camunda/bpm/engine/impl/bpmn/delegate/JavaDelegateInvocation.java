@@ -10,32 +10,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.delegate;
+package org.camunda.bpm.engine.impl.bpmn.delegate;
 
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
 
 /**
+ * Class handling invocations of JavaDelegates
  * 
  * @author Daniel Meyer
  */
-public class ActivityBehaviorInvocation extends DelegateInvocation {
+public class JavaDelegateInvocation extends DelegateInvocation {
 
-  protected final ActivityBehavior behaviorInstance;
+  protected final JavaDelegate delegateInstance;
+  protected final DelegateExecution execution;
 
-  protected final ActivityExecution execution;
-
-  public ActivityBehaviorInvocation(ActivityBehavior behaviorInstance, ActivityExecution execution) {
-    this.behaviorInstance = behaviorInstance;
+  public JavaDelegateInvocation(JavaDelegate delegateInstance, DelegateExecution execution) {
+    this.delegateInstance = delegateInstance;
     this.execution = execution;
   }
 
   protected void invoke() throws Exception {
-    behaviorInstance.execute(execution);
+    delegateInstance.execute((DelegateExecution) execution);
   }
-
+  
   public Object getTarget() {
-    return behaviorInstance;
+    return delegateInstance;
   }
 
 }

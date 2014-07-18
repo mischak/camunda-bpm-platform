@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
-import org.camunda.bpm.engine.impl.cmmn.handler.StagePlanItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.StageItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
@@ -36,7 +36,7 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
 
   protected Stage stage;
   protected PlanItem planItem;
-  protected StagePlanItemHandler handler = new StagePlanItemHandler();
+  protected StageItemHandler handler = new StageItemHandler();
   protected CmmnHandlerContext context;
 
   @Before

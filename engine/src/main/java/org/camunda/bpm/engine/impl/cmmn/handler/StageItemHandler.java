@@ -12,29 +12,24 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.TaskActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.model.cmmn.instance.PlanItem;
-import org.camunda.bpm.model.cmmn.instance.Task;
+import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class TaskPlanItemHandler extends PlanItemHandler {
+public class StageItemHandler extends ItemHandler {
 
-  @Override
-  protected void initializeActivity(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
-    super.initializeActivity(planItem, activity, context);
-
-    Task task = (Task) planItem.getDefinition();
-    activity.setProperty("isBlocking", task.isBlocking());
+  protected CmmnActivityBehavior getActivityBehavior() {
+    return new StageActivityBehavior();
   }
 
-  @Override
-  protected CmmnActivityBehavior getActivityBehavior() {
-    return new TaskActivityBehavior();
+  protected List<String> getStandardEvents(CmmnElement element) {
+    return TASK_OR_STAGE_EVENTS;
   }
 
 }

@@ -10,14 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.delegate;
+package org.camunda.bpm.engine.impl.task.delegate;
 
+import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.context.ExecutionContext;
+import org.camunda.bpm.engine.impl.context.CoreExecutionContext;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
  * Class handling invocations of {@link TaskListener TaskListeners}
@@ -33,18 +36,21 @@ public class TaskListenerInvocation extends DelegateInvocation {
     this(executionListenerInstance, delegateTask, null);
   }
 
-  public TaskListenerInvocation(TaskListener executionListenerInstance, DelegateTask delegateTask,
-      ActivityExecution contextExecution) {
+  public TaskListenerInvocation(TaskListener executionListenerInstance, DelegateTask delegateTask, BaseDelegateExecution contextExecution) {
     this.executionListenerInstance = executionListenerInstance;
     this.delegateTask = delegateTask;
     this.contextExecution = contextExecution;
   }
 
   protected void invoke() throws Exception {
-    ExecutionContext executionContext = Context.getExecutionContext();
+    CoreExecutionContext<? extends CoreExecution> executionContext = Context.getCoreExecutionContext();
     try {
       if (executionContext == null) {
-        Context.setExecutionContext((ExecutionEntity) contextExecution);
+        if (contextExecution instanceof ExecutionEntity) {
+          Context.setExecutionContext((ExecutionEntity) contextExecution);
+        } else {
+          Context.setExecutionContext((CaseExecutionEntity) contextExecution);
+        }
       }
       executionListenerInstance.notify(delegateTask);
     }

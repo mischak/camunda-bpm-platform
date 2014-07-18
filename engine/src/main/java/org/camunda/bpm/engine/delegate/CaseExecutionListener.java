@@ -36,6 +36,6 @@ public interface CaseExecutionListener extends DelegateListener<DelegateCaseExec
   String PARENT_RESUME = "parentResume";
   String CLOSE = "close";
 
-  void notify(DelegateCaseExecution planItem) throws Exception;
+  void notify(DelegateCaseExecution caseExecution) throws Exception;
 
 }

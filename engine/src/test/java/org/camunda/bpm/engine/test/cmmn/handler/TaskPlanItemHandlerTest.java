@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
-import org.camunda.bpm.engine.impl.cmmn.handler.TaskPlanItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.TaskItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
@@ -37,7 +37,7 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
   protected Task task;
   protected PlanItem planItem;
-  protected TaskPlanItemHandler handler = new TaskPlanItemHandler();
+  protected TaskItemHandler handler = new TaskItemHandler();
   protected CmmnHandlerContext context;
 
   @Before

@@ -10,32 +10,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.delegate;
+package org.camunda.bpm.engine.impl.bpmn.delegate;
 
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
- * Class handling invocations of ExecutionListeners
  * 
  * @author Daniel Meyer
  */
-public class ExecutionListenerInvocation extends DelegateInvocation {
+public class ActivityBehaviorInvocation extends DelegateInvocation {
 
-  protected final ExecutionListener executionListenerInstance;
-  protected final DelegateExecution execution;
+  protected final ActivityBehavior behaviorInstance;
 
-  public ExecutionListenerInvocation(ExecutionListener executionListenerInstance, DelegateExecution execution) {
-    this.executionListenerInstance = executionListenerInstance;
+  protected final ActivityExecution execution;
+
+  public ActivityBehaviorInvocation(ActivityBehavior behaviorInstance, ActivityExecution execution) {
+    this.behaviorInstance = behaviorInstance;
     this.execution = execution;
   }
 
   protected void invoke() throws Exception {
-    executionListenerInstance.notify(execution);
+    behaviorInstance.execute(execution);
   }
-  
+
   public Object getTarget() {
-    return executionListenerInstance;
+    return behaviorInstance;
   }
 
 }

@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.Expression;
@@ -27,27 +26,24 @@ import org.camunda.bpm.engine.impl.core.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.util.StringUtil;
-import org.camunda.bpm.model.cmmn.Query;
-import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
-import org.camunda.bpm.model.cmmn.instance.PlanItem;
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaIn;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaOut;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
  * @author Roman Smirnov
  *
  */
-public abstract class ProcessOrCaseTaskPlanItemHandler extends TaskPlanItemHandler {
+public abstract class ProcessOrCaseTaskItemHandler extends TaskItemHandler {
 
-  protected void initializeActivity(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
-    super.initializeActivity(planItem, activity, context);
+  protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    super.initializeActivity(element, activity, context);
 
-    initializeCallableElement(planItem, activity, context);
+    initializeCallableElement(element, activity, context);
   }
 
-  protected void initializeCallableElement(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeCallableElement(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     CallableElement callableElement = new CallableElement();
 
     // set callableElement on behavior
@@ -55,30 +51,30 @@ public abstract class ProcessOrCaseTaskPlanItemHandler extends TaskPlanItemHandl
     behavior.setCallableElement(callableElement);
 
     // definition key
-    initializeDefinitionKey(planItem, activity, context, callableElement);
+    initializeDefinitionKey(element, activity, context, callableElement);
 
     // binding
-    initializeBinding(planItem, activity, context, callableElement);
+    initializeBinding(element, activity, context, callableElement);
 
     // version
-    initializeVersion(planItem, activity, context, callableElement);
+    initializeVersion(element, activity, context, callableElement);
 
     // inputs
-    initializeInputParameter(planItem, activity, context);
+    initializeInputParameter(element, activity, context);
 
     // outputs
-    initializeOutputParameter(planItem, activity, context);
+    initializeOutputParameter(element, activity, context);
   }
 
-  protected void initializeDefinitionKey(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context, CallableElement callableElement) {
+  protected void initializeDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CallableElement callableElement) {
     ExpressionManager expressionManager = context.getExpressionManager();
-    String definitionKey = getDefinitionKey(planItem, activity, context);
+    String definitionKey = getDefinitionKey(element, activity, context);
     ParameterValueProvider definitionKeyProvider = createParameterValueProvider(definitionKey, expressionManager);
     callableElement.setDefinitionKeyValueProvider(definitionKeyProvider);
   }
 
-  protected void initializeBinding(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context, CallableElement callableElement) {
-    String binding = getBinding(planItem, activity, context);
+  protected void initializeBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CallableElement callableElement) {
+    String binding = getBinding(element, activity, context);
 
     if (CallableElementBinding.DEPLOYMENT.getValue().equals(binding)) {
       callableElement.setBinding(CallableElementBinding.DEPLOYMENT);
@@ -89,20 +85,20 @@ public abstract class ProcessOrCaseTaskPlanItemHandler extends TaskPlanItemHandl
     }
   }
 
-  protected void initializeVersion(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context, CallableElement callableElement) {
+  protected void initializeVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CallableElement callableElement) {
     ExpressionManager expressionManager = context.getExpressionManager();
-    String version = getVersion(planItem, activity, context);
+    String version = getVersion(element, activity, context);
     ParameterValueProvider versionProvider = createParameterValueProvider(version, expressionManager);
     callableElement.setVersionValueProvider(versionProvider);
   }
 
-  protected void initializeInputParameter(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeInputParameter(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     ProcessOrCaseTaskActivityBehavior behavior = (ProcessOrCaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     ExpressionManager expressionManager = context.getExpressionManager();
 
-    List<CamundaIn> inputs = getInputs(planItem);
+    List<CamundaIn> inputs = getInputs(element);
 
     for (CamundaIn input : inputs) {
 
@@ -140,13 +136,13 @@ public abstract class ProcessOrCaseTaskPlanItemHandler extends TaskPlanItemHandl
     }
   }
 
-  protected void initializeOutputParameter(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeOutputParameter(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     ProcessOrCaseTaskActivityBehavior behavior = (ProcessOrCaseTaskActivityBehavior) activity.getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     ExpressionManager expressionManager = context.getExpressionManager();
 
-    List<CamundaOut> outputs = getOutputs(planItem);
+    List<CamundaOut> outputs = getOutputs(element);
 
     for (CamundaOut output : outputs) {
 
@@ -177,25 +173,14 @@ public abstract class ProcessOrCaseTaskPlanItemHandler extends TaskPlanItemHandl
     }
   }
 
-  protected List<CamundaIn> getInputs(PlanItem planItem) {
-    return getParameter(planItem, CamundaIn.class);
+  protected List<CamundaIn> getInputs(CmmnElement element) {
+    PlanItemDefinition definition = getDefinition(element);
+    return queryExtensionElementsByClass(definition, CamundaIn.class);
   }
 
-  protected List<CamundaOut> getOutputs(PlanItem planItem) {
-    return getParameter(planItem, CamundaOut.class);
-  }
-
-  protected <T extends ModelElementInstance> List<T> getParameter(PlanItem planItem, Class<T> cls) {
-    PlanItemDefinition definition = getDefinition(planItem);
-    ExtensionElements extensionElements = definition.getExtensionElements();
-
-    if (extensionElements != null) {
-      Query<ModelElementInstance> query = extensionElements.getElementsQuery();
-      return query.filterByType(cls).list();
-
-    } else {
-      return new ArrayList<T>();
-    }
+  protected List<CamundaOut> getOutputs(CmmnElement element) {
+    PlanItemDefinition definition = getDefinition(element);
+    return queryExtensionElementsByClass(definition, CamundaOut.class);
   }
 
   protected ParameterValueProvider createParameterValueProvider(String value, ExpressionManager expressionManager) {
@@ -211,10 +196,10 @@ public abstract class ProcessOrCaseTaskPlanItemHandler extends TaskPlanItemHandl
     }
   }
 
-  protected abstract String getDefinitionKey(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context);
+  protected abstract String getDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
 
-  protected abstract String getBinding(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context);
+  protected abstract String getBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
 
-  protected abstract String getVersion(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context);
+  protected abstract String getVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
 
 }

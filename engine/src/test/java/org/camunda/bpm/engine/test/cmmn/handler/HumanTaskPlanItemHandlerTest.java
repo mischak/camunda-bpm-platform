@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
-import org.camunda.bpm.engine.impl.cmmn.handler.HumanTaskPlanItemHandler;
+import org.camunda.bpm.engine.impl.cmmn.handler.HumanTaskItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -47,7 +47,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
   protected HumanTask humanTask;
   protected PlanItem planItem;
-  protected HumanTaskPlanItemHandler handler = new HumanTaskPlanItemHandler();
+  protected HumanTaskItemHandler handler = new HumanTaskItemHandler();
   protected CmmnHandlerContext context;
 
   @Before

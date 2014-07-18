@@ -12,27 +12,38 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.Task;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class HumanTaskDiscretionaryItemHandler extends DiscretionaryItemHandler {
+public class TaskItemHandler extends ItemHandler {
 
   @Override
-  protected CmmnActivityBehavior getActivityBehavior() {
-    return new HumanTaskActivityBehavior();
+  protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    super.initializeActivity(element, activity, context);
+
+    initializeBlocking(element, activity, context);
   }
 
-  @Override
-  protected void handleElementProperties(DiscretionaryItem discretionaryItem, CmmnActivity activity, CmmnHandlerContext context) {
-    Task task = (Task) discretionaryItem.getDefinition();
+  protected void initializeBlocking(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    Task task = (Task) getDefinition(element);
     activity.setProperty("isBlocking", task.isBlocking());
+  }
+
+  protected CmmnActivityBehavior getActivityBehavior() {
+    return new TaskActivityBehavior();
+  }
+
+  protected List<String> getStandardEvents(CmmnElement element) {
+    return TASK_OR_STAGE_EVENTS;
   }
 
 }

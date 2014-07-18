@@ -16,36 +16,36 @@ import org.camunda.bpm.engine.impl.cmmn.behavior.CaseTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
-import org.camunda.bpm.model.cmmn.instance.PlanItem;
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseTaskPlanItemHandler extends ProcessOrCaseTaskPlanItemHandler {
+public class CaseTaskPlanItemHandler extends ProcessOrCaseTaskItemHandler {
 
   protected CmmnActivityBehavior getActivityBehavior() {
     return new CaseTaskActivityBehavior();
   }
 
-  protected CaseTask getDefinition(PlanItem planItem) {
-    return (CaseTask) planItem.getDefinition();
+  protected CaseTask getDefinition(CmmnElement element) {
+    return (CaseTask) super.getDefinition(element);
   }
 
-  protected String getDefinitionKey(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
-    CaseTask definition = getDefinition(planItem);
+  protected String getDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    CaseTask definition = getDefinition(element);
 
     return definition.getCase();
   }
 
-  protected String getBinding(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
-    CaseTask definition = getDefinition(planItem);
+  protected String getBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    CaseTask definition = getDefinition(element);
 
     return definition.getCamundaCaseBinding();
   }
 
-  protected String getVersion(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
-    CaseTask definition = getDefinition(planItem);
+  protected String getVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    CaseTask definition = getDefinition(element);
 
     return definition.getCamundaCaseVersion();
   }

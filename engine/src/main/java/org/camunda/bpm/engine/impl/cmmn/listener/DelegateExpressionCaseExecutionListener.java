@@ -10,54 +10,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.bpmn.listener;
+package org.camunda.bpm.engine.impl.cmmn.listener;
 
 import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.applyFieldDeclaration;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.bpmn.delegate.ExecutionListenerInvocation;
-import org.camunda.bpm.engine.impl.bpmn.delegate.JavaDelegateInvocation;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.delegate.CaseExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.context.Context;
 
 
 /**
- * @author Joram Barrez
+ * @author Roman Smirnov
  */
-public class DelegateExpressionExecutionListener implements ExecutionListener {
+public class DelegateExpressionCaseExecutionListener implements CaseExecutionListener {
 
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;
 
-  public DelegateExpressionExecutionListener(Expression expression, List<FieldDeclaration> fieldDeclarations) {
+  public DelegateExpressionCaseExecutionListener(Expression expression, List<FieldDeclaration> fieldDeclarations) {
     this.expression = expression;
     this.fieldDeclarations = fieldDeclarations;
   }
 
-  public void notify(DelegateExecution execution) throws Exception {
+  public void notify(DelegateCaseExecution caseExecution) throws Exception {
     // Note: we can't cache the result of the expression, because the
-    // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'
-    Object delegate = expression.getValue(execution);
+    // caseExecution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'
+    Object delegate = expression.getValue(caseExecution);
     applyFieldDeclaration(fieldDeclarations, delegate);
 
-    if (delegate instanceof ExecutionListener) {
-      Context.getProcessEngineConfiguration()
+    if (delegate instanceof CaseExecutionListener) {
+      CaseExecutionListener listenerInstance = (CaseExecutionListener) delegate;
+      Context
+        .getProcessEngineConfiguration()
         .getDelegateInterceptor()
-        .handleInvocation(new ExecutionListenerInvocation((ExecutionListener) delegate, execution));
-    } else if (delegate instanceof JavaDelegate) {
-      Context.getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
+        .handleInvocation(new CaseExecutionListenerInvocation(listenerInstance, caseExecution));
     } else {
       throw new ProcessEngineException("Delegate expression " + expression
-              + " did not resolve to an implementation of " + ExecutionListener.class
-              + " nor " + JavaDelegate.class);
+              + " did not resolve to an implementation of " + CaseExecutionListener.class);
     }
   }
 

@@ -64,5 +64,4 @@ public class CaseHandler extends CmmnElementHandler<Case> {
     return definition;
   }
 
-
 }

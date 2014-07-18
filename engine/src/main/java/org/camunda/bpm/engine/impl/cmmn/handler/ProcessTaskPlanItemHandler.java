@@ -15,37 +15,37 @@ package org.camunda.bpm.engine.impl.cmmn.handler;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.ProcessTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.model.cmmn.instance.PlanItem;
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class ProcessTaskPlanItemHandler extends ProcessOrCaseTaskPlanItemHandler {
+public class ProcessTaskPlanItemHandler extends ProcessOrCaseTaskItemHandler {
 
   protected CmmnActivityBehavior getActivityBehavior() {
     return new ProcessTaskActivityBehavior();
   }
 
-  protected ProcessTask getDefinition(PlanItem planItem) {
-    return (ProcessTask) planItem.getDefinition();
+  protected ProcessTask getDefinition(CmmnElement element) {
+    return (ProcessTask) super.getDefinition(element);
   }
 
-  protected String getDefinitionKey(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
-    ProcessTask definition = getDefinition(planItem);
+  protected String getDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    ProcessTask definition = getDefinition(element);
 
     return definition.getProcess();
   }
 
-  protected String getBinding(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
-    ProcessTask definition = getDefinition(planItem);
+  protected String getBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    ProcessTask definition = getDefinition(element);
 
     return definition.getCamundaProcessBinding();
   }
 
-  protected String getVersion(PlanItem planItem, CmmnActivity activity, CmmnHandlerContext context) {
-    ProcessTask definition = getDefinition(planItem);
+  protected String getVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    ProcessTask definition = getDefinition(element);
 
     return definition.getCamundaProcessVersion();
   }

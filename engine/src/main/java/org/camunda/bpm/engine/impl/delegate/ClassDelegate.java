@@ -10,20 +10,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.handler;
+package org.camunda.bpm.engine.impl.delegate;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class StagePlanItemHandler extends PlanItemHandler {
+public abstract class ClassDelegate {
 
-  @Override
-  protected CmmnActivityBehavior getActivityBehavior() {
-    return new StageActivityBehavior();
+  protected String className;
+  protected List<FieldDeclaration> fieldDeclarations;
+
+  public ClassDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
+    this.className = className;
+    this.fieldDeclarations = fieldDeclarations;
+  }
+
+  public ClassDelegate(Class<?> clazz, List<FieldDeclaration> fieldDeclarations) {
+    this(clazz.getName(), fieldDeclarations);
   }
 
 }
