@@ -183,7 +183,47 @@
     </profile>
   </profiles>
 
-  <licenses>
+  <build>
+      <pluginManagement>
+          <plugins>
+              <plugin>
+                  <groupId>org.sonatype.plugins</groupId>
+                  <artifactId>nexus-staging-maven-plugin</artifactId>
+                  <version>1.5.1</version>
+                  <executions>
+                      <execution>
+                          <id>default-deploy</id>
+                          <phase>none</phase>
+                          <goals>
+                              <goal>deploy</goal>
+                          </goals>
+                      </execution>
+                  </executions>
+                  <configuration>
+                      <serverId>deployment</serverId>
+                      <nexusUrl>http://build.staff-finder.jobs/nexus/</nexusUrl>
+                      <skipStaging>false</skipStaging>
+                  </configuration>
+              </plugin>
+
+          </plugins>
+      </pluginManagement>
+  </build>
+
+    <distributionManagement>
+        <repository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://build.staff-finder.jobs/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://build.staff-finder.jobs/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
